@@ -1,0 +1,2310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WorkSync | Simple & Modern Project Management</title>
+  <!-- Google Fonts: Inter (400, 500, 600, 700) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      /* Brand Palette (Strictly from Brand Guide) */
+      --color-primary: #4F46E5;        /* Indigo Blue */
+      --color-primary-dark: #3730A3;   /* Deep Indigo */
+      --color-secondary: #0EA5E9;      /* Sky Blue */
+      --color-accent: #14B8A6;         /* Teal */
+      --color-success: #22C55E;        /* Green */
+      --color-warning: #F59E0B;        /* Amber */
+      --color-error: #EF4444;          /* Red */
+      --color-purple: #8B5CF6;         /* Review / Purple */
+
+      --bg-app: #F8FAFC;               /* Soft Gray */
+      --bg-surface: #FFFFFF;           /* White */
+      --bg-surface-hover: #F1F5F9;     /* Light Surface Hover */
+      --bg-surface-alt: #F8FAFC;       /* Off-white panel */
+
+      --text-primary: #0F172A;         /* Slate */
+      --text-secondary: #64748B;       /* Gray */
+      --text-muted: #94A3B8;           /* Light Muted Gray */
+
+      --border-color: #E2E8F0;         /* Light Gray Border */
+      --border-focus: #4F46E5;         /* Active Focus Border */
+
+      /* Status Colors */
+      --status-completed: #22C55E;     /* Completed (Green) */
+      --status-in-progress: #4F46E5;   /* In Progress (Indigo) */
+      --status-pending: #F59E0B;       /* Pending (Amber) */
+      --status-overdue: #EF4444;       /* Overdue (Red) */
+      --status-not-started: #64748B;   /* Not Started (Gray) */
+      --status-review: #8B5CF6;        /* Review (Purple) */
+
+      /* Typography Scale */
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-page-title: 700 28px/1.25 var(--font-family);
+      --font-section-title: 600 20px/1.3 var(--font-family);
+      --font-card-title: 600 16px/1.4 var(--font-family);
+      --font-body: 400 14px/1.5 var(--font-family);
+      --font-secondary: 400 13px/1.5 var(--font-family);
+      --font-button: 600 14px/1.4 var(--font-family);
+      --font-caption: 400 12px/1.4 var(--font-family);
+
+      /* Shape & Shadows */
+      --radius-card: 12px;
+      --radius-btn: 8px;
+      --radius-sm: 6px;
+      --radius-full: 9999px;
+
+      --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+      --shadow-card: 0 2px 6px -1px rgba(15, 23, 42, 0.04), 0 1px 3px -1px rgba(15, 23, 42, 0.03);
+      --shadow-float: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Layout Shell */
+    .app-layout {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background-color: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      height: 100vh;
+      user-select: none;
+    }
+
+    /* Logo - Checkmark inside rounded square */
+    .brand-header {
+      padding: 1.25rem 1.25rem 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand-logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background-color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+    }
+
+    .brand-name {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .brand-tagline {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .nav-group-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0 0.65rem 0.45rem;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: var(--radius-btn);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: 1px solid transparent;
+    }
+
+    .nav-item:hover {
+      background-color: var(--bg-surface-hover);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background-color: #EEF2FF; /* Tinted Indigo */
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    .nav-item.active i {
+      color: var(--color-primary);
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-full);
+      background-color: #F1F5F9;
+      color: var(--text-secondary);
+    }
+
+    .nav-item.active .nav-badge {
+      background-color: #E0E7FF;
+      color: var(--color-primary);
+    }
+
+    /* Pinned Projects List in Sidebar */
+    .project-shortcut {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.45rem 0.65rem;
+      border-radius: var(--radius-btn);
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .project-shortcut:hover, .project-shortcut.active {
+      background-color: var(--bg-surface-hover);
+      color: var(--text-primary);
+    }
+
+    .project-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Sidebar Footer / Productivity Card */
+    .sidebar-footer {
+      padding: 1rem;
+      border-top: 1px solid var(--border-color);
+      background-color: #FAFAFC;
+    }
+
+    .streak-box {
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.75rem 0.85rem;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .streak-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .streak-bar-bg {
+      height: 5px;
+      background-color: #F1F5F9;
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .streak-bar-fill {
+      height: 100%;
+      width: 85%;
+      background-color: var(--color-warning);
+      border-radius: var(--radius-full);
+    }
+
+    /* Main Viewport */
+    .viewport {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    /* Top Bar */
+    .topbar {
+      height: 64px;
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .search-input-box {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      background-color: #F8FAFC;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-btn);
+      padding: 0.45rem 0.85rem;
+      width: 320px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .search-input-box:hover {
+      border-color: #CBD5E1;
+      background-color: #FFFFFF;
+    }
+
+    .search-input-box input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      width: 100%;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    .kbd-tag {
+      font-size: 11px;
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      font-family: var(--font-family);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-btn);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      user-select: none;
+      text-decoration: none;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.75rem;
+      font-size: 13px;
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary);
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--color-primary-dark);
+      box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+    }
+
+    .btn-secondary {
+      background-color: #FFFFFF;
+      border-color: var(--border-color);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .btn-secondary:hover {
+      background-color: #F8FAFC;
+      border-color: #CBD5E1;
+    }
+
+    .btn-secondary.active {
+      background-color: #EEF2FF;
+      border-color: #C7D2FE;
+      color: var(--color-primary);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+
+    .btn-ghost:hover {
+      background-color: #F1F5F9;
+      color: var(--text-primary);
+    }
+
+    .btn-icon {
+      padding: 0.5rem;
+      border-radius: var(--radius-btn);
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-icon:hover {
+      background-color: #F8FAFC;
+      color: var(--text-primary);
+      border-color: #CBD5E1;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.65rem 0.35rem 0.35rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-full);
+      background: #FFFFFF;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .avatar-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #EEF2FF;
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Main Canvas */
+    .main-canvas {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem 2.25rem 4rem;
+    }
+
+    /* Standard Card */
+    .card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-card);
+      transition: all var(--transition-fast);
+    }
+
+    .card-interactive:hover {
+      border-color: #CBD5E1;
+      box-shadow: var(--shadow-float);
+      transform: translateY(-2px);
+    }
+
+    /* Typography Classes */
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--text-primary);
+      letter-spacing: -0.025em;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--text-primary);
+      letter-spacing: -0.015em;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: var(--text-primary);
+    }
+
+    .body-text {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-primary);
+    }
+
+    .secondary-text {
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
+    .caption-text {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.4;
+      color: var(--text-muted);
+    }
+
+    /* View Switcher */
+    .view-content {
+      display: none;
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+
+    .view-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Badges & Status Indicators */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: currentColor;
+    }
+
+    /* Semantic Status Badges */
+    .badge-completed { background-color: #DCFCE7; color: #15803D; }
+    .badge-in-progress { background-color: #EEF2FF; color: #4F46E5; }
+    .badge-pending { background-color: #FEF3C7; color: #B45309; }
+    .badge-overdue { background-color: #FEE2E2; color: #B91C1C; }
+    .badge-not-started { background-color: #F1F5F9; color: #475569; }
+    .badge-review { background-color: #F3E8FF; color: #7E22CE; }
+    .badge-teal { background-color: #CCFBF1; color: #0F766E; }
+    .badge-sky { background-color: #E0F2FE; color: #0369A1; }
+
+    /* Scorecards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .stat-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stat-num {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+    }
+
+    /* 5-Column Kanban Board */
+    .kanban-container {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(270px, 1fr));
+      gap: 1.25rem;
+      overflow-x: auto;
+      padding-bottom: 1.5rem;
+      min-height: 520px;
+    }
+
+    .kanban-col {
+      background-color: #F1F5F9;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      display: flex;
+      flex-direction: column;
+      max-height: calc(100vh - 250px);
+    }
+
+    .kanban-header {
+      padding: 0.85rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      background-color: #F8FAFC;
+      border-top-left-radius: var(--radius-card);
+      border-top-right-radius: var(--radius-card);
+    }
+
+    .kanban-header-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .kanban-count-pill {
+      font-size: 11px;
+      font-weight: 600;
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-full);
+      color: var(--text-secondary);
+    }
+
+    .kanban-cards-wrap {
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .task-card-item {
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.9rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-subtle);
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+
+    .task-card-item:hover {
+      border-color: #CBD5E1;
+      box-shadow: var(--shadow-card);
+      transform: translateY(-1px);
+    }
+
+    .task-card-item.is-completed {
+      opacity: 0.7;
+    }
+
+    .task-card-item.is-completed .task-title-text {
+      text-decoration: line-through;
+      color: var(--text-secondary);
+    }
+
+    .task-title-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .task-meta-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.65rem;
+    }
+
+    .task-shifter-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.35rem;
+      margin-top: 0.65rem;
+      padding-top: 0.5rem;
+      border-top: 1px dashed var(--border-color);
+    }
+
+    .shift-btn {
+      background: #F8FAFC;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      border-radius: 4px;
+      padding: 0.2rem 0.45rem;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .shift-btn:hover {
+      background: #EEF2FF;
+      color: var(--color-primary);
+      border-color: #C7D2FE;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal-dialog {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      width: 100%;
+      max-width: 500px;
+      padding: 1.75rem;
+      box-shadow: var(--shadow-float);
+    }
+
+    /* Toasts */
+    .toast-tray {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .toast-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-btn);
+      padding: 0.75rem 1rem;
+      box-shadow: var(--shadow-float);
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 13px;
+      font-weight: 600;
+      animation: toastSlide 0.25s ease-out forwards;
+      pointer-events: auto;
+    }
+
+    @keyframes toastSlide {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <!-- Logo: Checkmark inside rounded square + WorkSync -->
+      <div class="brand-header">
+        <div class="brand-logo-icon">
+          <i data-lucide="check" size="20" stroke-width="2.5"></i>
+        </div>
+        <div>
+          <div class="brand-name">WorkSync</div>
+          <div class="brand-tagline">Project Management</div>
+        </div>
+      </div>
+
+      <div class="sidebar-content">
+        <div>
+          <div class="nav-group-title">Navigation</div>
+          <ul class="nav-list">
+            <li>
+              <a class="nav-item active" data-view="dashboard" id="nav-dashboard">
+                <i data-lucide="layout-dashboard" size="18"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav-item" data-view="projects" id="nav-projects">
+                <i data-lucide="folder" size="18"></i>
+                <span>Projects</span>
+                <span class="nav-badge" id="navProjBadge">3</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav-item" data-view="workspace" id="nav-workspace">
+                <i data-lucide="kanban" size="18"></i>
+                <span>Kanban Board</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav-item" data-view="tasks" id="nav-tasks">
+                <i data-lucide="check-square" size="18"></i>
+                <span>My Tasks</span>
+                <span class="nav-badge" id="navTaskBadge">5</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav-item" data-view="calendar" id="nav-calendar">
+                <i data-lucide="calendar" size="18"></i>
+                <span>Calendar & Focus</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav-item" data-view="analytics" id="nav-analytics">
+                <i data-lucide="bar-chart-2" size="18"></i>
+                <span>Analytics</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav-item" data-view="settings" id="nav-settings">
+                <i data-lucide="settings" size="18"></i>
+                <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Pinned Projects Shortcuts -->
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 0.65rem 0.45rem;">
+            <span class="nav-group-title" style="padding: 0;">Projects</span>
+            <button class="btn-icon" style="width: 20px; height: 20px; padding: 0;" onclick="openNewProjectModal()" title="Add Project">
+              <i data-lucide="plus" size="12"></i>
+            </button>
+          </div>
+          <div id="sidebarProjectsShortcutList" style="display: flex; flex-direction: column; gap: 0.15rem;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Streak Box in Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="streak-box">
+          <div class="streak-title">
+            <span style="display: flex; align-items: center; gap: 0.4rem; color: var(--text-primary);">
+              <i data-lucide="zap" size="15" style="color: var(--color-warning);"></i>
+              Active Streak
+            </span>
+            <span style="color: var(--color-warning); font-weight: 700;">12 Days 🔥</span>
+          </div>
+          <div class="streak-bar-bg">
+            <div class="streak-bar-fill"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-top: 0.4rem;">
+            <span>Target: 6 hrs</span>
+            <span>85% completed</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Viewport -->
+    <div class="viewport">
+      <!-- Clean Top Bar -->
+      <header class="topbar">
+        <div class="search-input-box" onclick="openCommandModal()">
+          <i data-lucide="search" size="15"></i>
+          <input type="text" placeholder="Search tasks, projects, deadlines..." readonly />
+          <span class="kbd-tag">Ctrl K</span>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="btn btn-primary btn-sm" onclick="openNewTaskModal()">
+            <i data-lucide="plus" size="15"></i>
+            <span>New Task</span>
+          </button>
+
+          <button class="btn-icon" onclick="showToast('No new notifications')" title="Notifications">
+            <i data-lucide="bell" size="16"></i>
+          </button>
+
+          <div class="user-pill" title="Alex Mercer (Workspace Owner)">
+            <div class="avatar-circle">AM</div>
+            <span>Alex Mercer</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Scrollable Work Canvas -->
+      <main class="main-canvas">
+
+        <!-- 1. DASHBOARD VIEW -->
+        <section class="view-content active" id="view-dashboard">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2rem;">
+            <div>
+              <div class="caption-text" style="color: var(--color-primary); font-weight: 600; margin-bottom: 0.25rem;">
+                WORKSPACE OVERVIEW
+              </div>
+              <h1 class="page-title">Personal Dashboard</h1>
+              <p class="secondary-text" style="margin-top: 0.35rem;">
+                Track your progress, upcoming deadlines, and priority tasks with high clarity.
+              </p>
+            </div>
+            <div style="display: flex; gap: 0.65rem;">
+              <button class="btn btn-secondary btn-sm" onclick="switchView('workspace')">
+                <i data-lucide="kanban" size="15"></i>
+                <span>Open Kanban</span>
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="openNewTaskModal()">
+                <i data-lucide="plus" size="15"></i>
+                <span>Add Task</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 Scorecards -->
+          <div class="stats-grid">
+            <div class="card stat-card">
+              <div class="stat-header">
+                <span class="secondary-text" style="font-weight: 600;">Completed Tasks</span>
+                <div class="stat-icon-wrap" style="background-color: #DCFCE7; color: var(--color-success);">
+                  <i data-lucide="check-circle" size="18"></i>
+                </div>
+              </div>
+              <div class="stat-num" id="dashCompletedCount">4</div>
+              <div class="caption-text" style="color: var(--color-success); font-weight: 600; margin-top: 0.25rem;">
+                +2 finished today
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-header">
+                <span class="secondary-text" style="font-weight: 600;">Active Projects</span>
+                <div class="stat-icon-wrap" style="background-color: #EEF2FF; color: var(--color-primary);">
+                  <i data-lucide="folder" size="18"></i>
+                </div>
+              </div>
+              <div class="stat-num" id="dashProjectsCount">3</div>
+              <div class="caption-text" style="margin-top: 0.25rem;">
+                All on track
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-header">
+                <span class="secondary-text" style="font-weight: 600;">Focus Streak</span>
+                <div class="stat-icon-wrap" style="background-color: #FEF3C7; color: var(--color-warning);">
+                  <i data-lucide="zap" size="18"></i>
+                </div>
+              </div>
+              <div class="stat-num">12 Days</div>
+              <div class="caption-text" style="color: var(--color-warning); font-weight: 600; margin-top: 0.25rem;">
+                Reliable momentum
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-header">
+                <span class="secondary-text" style="font-weight: 600;">Completion Rate</span>
+                <div class="stat-icon-wrap" style="background-color: #CCFBF1; color: var(--color-accent);">
+                  <i data-lucide="trending-up" size="18"></i>
+                </div>
+              </div>
+              <div class="stat-num">88%</div>
+              <div class="caption-text" style="color: var(--color-accent); font-weight: 600; margin-top: 0.25rem;">
+                +5% vs last week
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Projects Section -->
+          <div style="margin-bottom: 2.5rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+              <div>
+                <h2 class="section-title">Active Projects</h2>
+                <span class="secondary-text">Current workspaces requiring execution</span>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="switchView('projects')">
+                <span>View All</span>
+                <i data-lucide="arrow-right" size="14"></i>
+              </button>
+            </div>
+            <div id="dashboardProjectsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem;">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Priority Action Items Section -->
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+              <div>
+                <h2 class="section-title">Priority Action Items</h2>
+                <span class="secondary-text">Urgent and High priority items to complete</span>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="switchView('tasks')">
+                <span>View All Tasks</span>
+                <i data-lucide="arrow-right" size="14"></i>
+              </button>
+            </div>
+            <div id="dashboardPriorityTasksList" style="display: flex; flex-direction: column; gap: 0.65rem;">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. PROJECTS DIRECTORY VIEW -->
+        <section class="view-content" id="view-projects">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.75rem;">
+            <div>
+              <div class="caption-text" style="color: var(--color-primary); font-weight: 600; margin-bottom: 0.25rem;">
+                DIRECTORIES
+              </div>
+              <h1 class="page-title">Projects</h1>
+              <p class="secondary-text" style="margin-top: 0.35rem;">
+                Organize, track milestones, and view project progression.
+              </p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openNewProjectModal()">
+              <i data-lucide="plus" size="15"></i>
+              <span>New Project</span>
+            </button>
+          </div>
+
+          <!-- Category Filters -->
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+            <div style="display: flex; gap: 0.5rem;" id="projCatButtons">
+              <button class="btn btn-secondary btn-sm active" data-cat="all" onclick="filterProjectsByCat('all')">All</button>
+              <button class="btn btn-secondary btn-sm" data-cat="side-project" onclick="filterProjectsByCat('side-project')">Side Projects</button>
+              <button class="btn btn-secondary btn-sm" data-cat="personal" onclick="filterProjectsByCat('personal')">Personal</button>
+              <button class="btn btn-secondary btn-sm" data-cat="learning" onclick="filterProjectsByCat('learning')">Learning</button>
+            </div>
+            <div class="search-input-box" style="width: 260px;">
+              <i data-lucide="search" size="14"></i>
+              <input type="text" placeholder="Filter by title..." oninput="searchProjects(this.value)" />
+            </div>
+          </div>
+
+          <div id="projectsDirectoryGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
+            <!-- Rendered by JS -->
+          </div>
+        </section>
+
+        <!-- 3. PROJECT WORKSPACE VIEW (Kanban / Table) -->
+        <section class="view-content" id="view-workspace">
+          <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.5rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.35rem;">
+                  <span class="project-dot" id="wsProjectDot" style="background-color: var(--color-primary); width: 10px; height: 10px;"></span>
+                  <span style="font-size: 13px; font-weight: 700; color: var(--text-secondary);" id="wsProjectKey">SYNC</span>
+                  <span class="badge badge-in-progress" id="wsProjectBadge">In Progress</span>
+                  <span style="color: var(--border-color);">•</span>
+                  <span class="secondary-text" id="wsProjectDueDate">Due Oct 15, 2026</span>
+                </div>
+                <h1 class="page-title" id="wsProjectTitle">WorkSync Web App</h1>
+                <p class="secondary-text" style="margin-top: 0.25rem; max-width: 680px;" id="wsProjectDesc">
+                  Personalized project management platform with kanban, list views, and focus mode.
+                </p>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 0.65rem;">
+                <button class="btn btn-secondary btn-sm" onclick="switchView('projects')">
+                  <i data-lucide="arrow-left" size="14"></i>
+                  <span>Switch Project</span>
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="openNewTaskModal()">
+                  <i data-lucide="plus" size="15"></i>
+                  <span>Add Task</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Workspace View Tabs -->
+            <div style="display: flex; gap: 0.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 1.25rem;">
+              <button class="btn btn-sm btn-secondary active" id="tabBtn-kanban" onclick="switchWorkspaceSubTab('kanban')">
+                <i data-lucide="kanban" size="14"></i> Kanban Board
+              </button>
+              <button class="btn btn-sm btn-ghost" id="tabBtn-table" onclick="switchWorkspaceSubTab('table')">
+                <i data-lucide="list" size="14"></i> Table List
+              </button>
+            </div>
+          </div>
+
+          <!-- 3A. Kanban Board Tab -->
+          <div id="wsSubTab-kanban">
+            <div class="kanban-container" id="kanbanColsContainer">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- 3B. Table List Tab -->
+          <div id="wsSubTab-table" style="display: none;">
+            <div class="card" style="padding: 0; overflow: hidden;">
+              <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                <thead>
+                  <tr style="background: #F8FAFC; color: var(--text-secondary); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-color);">
+                    <th style="padding: 0.85rem 1rem; width: 44px;">Done</th>
+                    <th style="padding: 0.85rem 1rem;">Task</th>
+                    <th style="padding: 0.85rem 1rem; width: 140px;">Status</th>
+                    <th style="padding: 0.85rem 1rem; width: 120px;">Priority</th>
+                    <th style="padding: 0.85rem 1rem; width: 140px;">Due Date</th>
+                    <th style="padding: 0.85rem 1rem; width: 110px;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="wsTableListBody">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. MY TASKS VIEW -->
+        <section class="view-content" id="view-tasks">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.75rem;">
+            <div>
+              <div class="caption-text" style="color: var(--color-primary); font-weight: 600; margin-bottom: 0.25rem;">
+                ACTION ITEMS
+              </div>
+              <h1 class="page-title">My Tasks</h1>
+              <p class="secondary-text" style="margin-top: 0.35rem;">
+                Universal personal inbox consolidating tasks across all projects.
+              </p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openNewTaskModal()">
+              <i data-lucide="plus" size="15"></i>
+              <span>Add Task</span>
+            </button>
+          </div>
+
+          <!-- Status / Priority Filters -->
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+            <button class="btn btn-secondary btn-sm active" data-pri="all" onclick="filterMyTasks('all')">All Priorities</button>
+            <button class="btn btn-secondary btn-sm" data-pri="urgent" onclick="filterMyTasks('urgent')">Urgent</button>
+            <button class="btn btn-secondary btn-sm" data-pri="high" onclick="filterMyTasks('high')">High</button>
+            <button class="btn btn-secondary btn-sm" data-pri="medium" onclick="filterMyTasks('medium')">Medium</button>
+            <button class="btn btn-secondary btn-sm" data-pri="low" onclick="filterMyTasks('low')">Low</button>
+          </div>
+
+          <!-- Task Table -->
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+              <thead>
+                <tr style="background: #F8FAFC; color: var(--text-secondary); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-color);">
+                  <th style="padding: 0.85rem 1rem; width: 44px;">Done</th>
+                  <th style="padding: 0.85rem 1rem;">Task Name</th>
+                  <th style="padding: 0.85rem 1rem; width: 160px;">Project</th>
+                  <th style="padding: 0.85rem 1rem; width: 130px;">Status</th>
+                  <th style="padding: 0.85rem 1rem; width: 110px;">Priority</th>
+                  <th style="padding: 0.85rem 1rem; width: 130px;">Due Date</th>
+                </tr>
+              </thead>
+              <tbody id="myTasksTableBody">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 5. CALENDAR & FOCUS STUDIO VIEW -->
+        <section class="view-content" id="view-calendar">
+          <div style="margin-bottom: 1.75rem;">
+            <div class="caption-text" style="color: var(--color-primary); font-weight: 600; margin-bottom: 0.25rem;">
+              SCHEDULE & FOCUS
+            </div>
+            <h1 class="page-title">Calendar & Focus Studio</h1>
+            <p class="secondary-text" style="margin-top: 0.35rem;">
+              Target deadlines and deep work intervals in one structured space.
+            </p>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+            <!-- Upcoming Deadlines List -->
+            <div class="card">
+              <h3 class="card-title" style="margin-bottom: 1.25rem;">Upcoming Deadlines</h3>
+              <div id="calendarCommitmentsList" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+
+            <!-- Pomodoro Studio -->
+            <div class="card" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+              <h3 class="card-title" style="margin-bottom: 0.25rem;">Deep Work Timer</h3>
+              <p class="caption-text" style="margin-bottom: 1.75rem;">
+                25-minute uninterrupted execution block
+              </p>
+
+              <div style="width: 170px; height: 170px; border-radius: 50%; border: 4px solid var(--color-primary); display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 1.75rem; background: #F8FAFC;">
+                <span style="font-size: 38px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em;" id="pomodoroDisplay">25:00</span>
+                <span class="caption-text" style="font-weight: 600; color: var(--color-primary); text-transform: uppercase;" id="pomodoroLabel">Interval 1/4</span>
+              </div>
+
+              <div style="display: flex; gap: 0.65rem; margin-bottom: 1.5rem;">
+                <button class="btn btn-primary btn-sm" onclick="togglePomodoro()">
+                  <i data-lucide="play" size="14" id="pomodoroIcon"></i>
+                  <span id="pomodoroBtnText">Start Focus</span>
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="resetPomodoro()">
+                  <i data-lucide="rotate-ccw" size="14"></i>
+                  <span>Reset</span>
+                </button>
+              </div>
+
+              <div style="width: 100%; border-top: 1px solid var(--border-color); padding-top: 0.85rem; display: flex; justify-content: space-around;" class="caption-text">
+                <span>🎯 Goal: 4 Blocks</span>
+                <span>Completed: 2 🔥</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. ANALYTICS VIEW -->
+        <section class="view-content" id="view-analytics">
+          <div style="margin-bottom: 1.75rem;">
+            <div class="caption-text" style="color: var(--color-primary); font-weight: 600; margin-bottom: 0.25rem;">
+              PERFORMANCE
+            </div>
+            <h1 class="page-title">Analytics & Productivity</h1>
+            <p class="secondary-text" style="margin-top: 0.35rem;">
+              Measure completion velocity, weekly throughput, and milestone consistency.
+            </p>
+          </div>
+
+          <!-- Weekly Velocity Card -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+              <div>
+                <h3 class="card-title">Completed Tasks Velocity</h3>
+                <span class="secondary-text">Number of items finished per day</span>
+              </div>
+              <span class="badge badge-completed">
+                <i data-lucide="trending-up" size="13"></i> +18% vs Last Week
+              </span>
+            </div>
+
+            <!-- Bar Chart -->
+            <div style="display: flex; align-items: flex-end; justify-content: space-between; height: 180px; gap: 1rem; padding: 1rem 0;" id="velocityChartBars">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Milestones Grid -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+            <div class="card" style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 44px; height: 44px; border-radius: 8px; background-color: #FEF3C7; color: var(--color-warning); display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="award" size="22"></i>
+              </div>
+              <div>
+                <h4 style="font-size: 15px; font-weight: 600;">10-Day Streak Master</h4>
+                <p class="secondary-text">Maintained consistent daily progress</p>
+              </div>
+            </div>
+
+            <div class="card" style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 44px; height: 44px; border-radius: 8px; background-color: #DCFCE7; color: var(--color-success); display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="zap" size="22"></i>
+              </div>
+              <div>
+                <h4 style="font-size: 15px; font-weight: 600;">High Velocity Peak</h4>
+                <p class="secondary-text">Finished 11 tasks in a single day</p>
+              </div>
+            </div>
+
+            <div class="card" style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 44px; height: 44px; border-radius: 8px; background-color: #EEF2FF; color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="target" size="22"></i>
+              </div>
+              <div>
+                <h4 style="font-size: 15px; font-weight: 600;">Clear Inbox Status</h4>
+                <p class="secondary-text">Zero overdue action items</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. SETTINGS VIEW -->
+        <section class="view-content" id="view-settings">
+          <div style="margin-bottom: 1.75rem;">
+            <div class="caption-text" style="color: var(--color-primary); font-weight: 600; margin-bottom: 0.25rem;">
+              PREFERENCES
+            </div>
+            <h1 class="page-title">Workspace Settings</h1>
+            <p class="secondary-text" style="margin-top: 0.35rem;">
+              Brand guidelines, user profile, and workflow configuration.
+            </p>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 640px;">
+            <!-- Brand Colors Reference -->
+            <div class="card">
+              <h3 class="card-title" style="margin-bottom: 0.25rem;">Brand Identity Palette</h3>
+              <p class="secondary-text" style="margin-bottom: 1.25rem;">
+                Official color palette specified in the Brand Book.
+              </p>
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;">
+                <div style="padding: 0.65rem; border: 1px solid var(--border-color); border-radius: 8px; text-align: center;">
+                  <div style="width: 100%; height: 28px; background: #4F46E5; border-radius: 4px; margin-bottom: 0.35rem;"></div>
+                  <div style="font-size: 12px; font-weight: 600;">Primary</div>
+                  <div class="caption-text">#4F46E5</div>
+                </div>
+                <div style="padding: 0.65rem; border: 1px solid var(--border-color); border-radius: 8px; text-align: center;">
+                  <div style="width: 100%; height: 28px; background: #0EA5E9; border-radius: 4px; margin-bottom: 0.35rem;"></div>
+                  <div style="font-size: 12px; font-weight: 600;">Secondary</div>
+                  <div class="caption-text">#0EA5E9</div>
+                </div>
+                <div style="padding: 0.65rem; border: 1px solid var(--border-color); border-radius: 8px; text-align: center;">
+                  <div style="width: 100%; height: 28px; background: #14B8A6; border-radius: 4px; margin-bottom: 0.35rem;"></div>
+                  <div style="font-size: 12px; font-weight: 600;">Accent</div>
+                  <div class="caption-text">#14B8A6</div>
+                </div>
+                <div style="padding: 0.65rem; border: 1px solid var(--border-color); border-radius: 8px; text-align: center;">
+                  <div style="width: 100%; height: 28px; background: #22C55E; border-radius: 4px; margin-bottom: 0.35rem;"></div>
+                  <div style="font-size: 12px; font-weight: 600;">Success</div>
+                  <div class="caption-text">#22C55E</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile Info -->
+            <div class="card">
+              <h3 class="card-title" style="margin-bottom: 0.25rem;">User Profile</h3>
+              <p class="secondary-text" style="margin-bottom: 1.25rem;">
+                Single-user personal project management workspace.
+              </p>
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="avatar-circle" style="width: 46px; height: 46px; font-size: 16px;">AM</div>
+                <div>
+                  <div style="font-weight: 600; font-size: 15px;">Alex Mercer</div>
+                  <div class="secondary-text">alex.mercer@worksync.local</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal: Create Task -->
+  <div class="modal-overlay" id="taskModal">
+    <div class="modal-dialog">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <h3 class="card-title" style="font-size: 18px;">Create New Task</h3>
+        <button class="btn-icon" onclick="closeModal('taskModal')"><i data-lucide="x" size="16"></i></button>
+      </div>
+      <form onsubmit="handleTaskSubmit(event)">
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div>
+            <label class="secondary-text" style="font-weight: 600; display: block; margin-bottom: 0.35rem;">Task Title</label>
+            <input type="text" id="modalTaskTitle" required placeholder="What needs to be done?" style="width: 100%; padding: 0.55rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none; font-family: inherit;" />
+          </div>
+
+          <div>
+            <label class="secondary-text" style="font-weight: 600; display: block; margin-bottom: 0.35rem;">Description</label>
+            <textarea id="modalTaskDesc" rows="2" placeholder="Key context or checklist..." style="width: 100%; padding: 0.55rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none; font-family: inherit; resize: vertical;"></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label class="secondary-text" style="font-weight: 600; display: block; margin-bottom: 0.35rem;">Project</label>
+              <select id="modalTaskProject" style="width: 100%; padding: 0.55rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none; background: #fff;"></select>
+            </div>
+
+            <div>
+              <label class="secondary-text" style="font-weight: 600; display: block; margin-bottom: 0.35rem;">Priority</label>
+              <select id="modalTaskPriority" style="width: 100%; padding: 0.55rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none; background: #fff;">
+                <option value="urgent">Urgent</option>
+                <option value="high" selected>High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="secondary-text" style="font-weight: 600; display: block; margin-bottom: 0.35rem;">Target Deadline</label>
+            <input type="date" id="modalTaskDueDate" style="width: 100%; padding: 0.55rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none; font-family: inherit;" />
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.65rem; margin-top: 0.75rem;">
+            <button type="button" class="btn btn-ghost" onclick="closeModal('taskModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Task</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Create Project -->
+  <div class="modal-overlay" id="projectModal">
+    <div class="modal-dialog">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <h3 class="card-title" style="font-size: 18px;">Create New Project</h3>
+        <button class="btn-icon" onclick="closeModal('projectModal')"><i data-lucide="x" size="16"></i></button>
+      </div>
+      <form onsubmit="handleProjectSubmit(event)">
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div>
+            <label class="secondary-text" style="font-weight: 600; display: block; margin-bottom: 0.35rem;">Project Title</label>
+            <input type="text" id="modalProjName" required placeholder="e.g. Developer Portfolio Redesign" style="width: 100%; padding: 0.55rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none; font-family: inherit;" />
+          </div>
+
+          <div>
+            <label class="secondary-text" style="font-weight: 600; display: block; margin-bottom: 0.35rem;">Description</label>
+            <textarea id="modalProjDesc" rows="2" placeholder="Brief project summary or scope..." style="width: 100%; padding: 0.55rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none; font-family: inherit; resize: vertical;"></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label class="secondary-text" style="font-weight: 600; display: block; margin-bottom: 0.35rem;">Short Key</label>
+              <input type="text" id="modalProjKey" required placeholder="e.g. PORT" maxlength="5" style="width: 100%; padding: 0.55rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none; font-family: inherit; text-transform: uppercase;" />
+            </div>
+
+            <div>
+              <label class="secondary-text" style="font-weight: 600; display: block; margin-bottom: 0.35rem;">Category</label>
+              <select id="modalProjCategory" style="width: 100%; padding: 0.55rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none; background: #fff;">
+                <option value="side-project">Side Project</option>
+                <option value="personal">Personal</option>
+                <option value="learning">Learning</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.65rem; margin-top: 0.75rem;">
+            <button type="button" class="btn btn-ghost" onclick="closeModal('projectModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Project</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Command Palette (Ctrl+K) -->
+  <div class="modal-overlay" id="commandModal">
+    <div class="modal-dialog" style="max-width: 480px; padding: 1.25rem;">
+      <div style="display: flex; align-items: center; gap: 0.65rem; background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.65rem 0.85rem; margin-bottom: 1rem;">
+        <i data-lucide="search" size="18" style="color: var(--text-secondary);"></i>
+        <input type="text" id="cmdInput" placeholder="Jump to any view, project, or action..." style="background: transparent; border: none; outline: none; color: var(--text-primary); width: 100%; font-size: 14px; font-family: inherit;" oninput="filterCommandList(this.value)" />
+        <span class="kbd-tag">ESC</span>
+      </div>
+      <div id="cmdList" style="display: flex; flex-direction: column; gap: 0.25rem;">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Tray -->
+  <div class="toast-tray" id="toastTray"></div>
+
+  <!-- Application Logic -->
+  <script>
+    // App State (With Brand Guidelines Mapping)
+    const state = {
+      currentView: 'dashboard',
+      currentWsTab: 'kanban',
+      activeProjectId: 'proj_worksync_core',
+      activeCategoryFilter: 'all',
+      activePriorityFilter: 'all',
+      pomodoroSeconds: 1500,
+      pomodoroRunning: false,
+      pomodoroTimer: null,
+      projects: [
+        {
+          id: 'proj_worksync_core',
+          name: 'WorkSync Web App',
+          description: 'Personalized project management platform with kanban, list views, and focus mode',
+          key: 'SYNC',
+          color: '#4F46E5', // Primary Indigo
+          category: 'side-project',
+          status: 'In Progress',
+          dueDate: '2026-10-15',
+        },
+        {
+          id: 'proj_personal_branding',
+          name: 'Portfolio & Personal Brand',
+          description: 'Modern developer portfolio redesign, case studies, and technical writing',
+          key: 'PORT',
+          color: '#0EA5E9', // Sky Blue
+          category: 'personal',
+          status: 'In Progress',
+          dueDate: '2026-11-01',
+        },
+        {
+          id: 'proj_ai_agent_research',
+          name: 'Autonomous Agent Research',
+          description: 'Experimenting with tool calling, multi-agent coordination, and MCP servers',
+          key: 'AGNT',
+          color: '#14B8A6', // Teal Accent
+          category: 'learning',
+          status: 'In Progress',
+          dueDate: '2026-12-20',
+        },
+      ],
+      tasks: [
+        {
+          id: 'task_1',
+          title: 'Design modular folder structure & project foundations',
+          description: 'Architect domain-driven directories, Next.js routing, and reusable UI tokens.',
+          status: 'completed',
+          priority: 'urgent',
+          projectId: 'proj_worksync_core',
+          dueDate: '2026-09-18',
+        },
+        {
+          id: 'task_2',
+          title: 'Implement interactive Kanban Board view',
+          description: 'Cards across Not Started, Pending, In Progress, Review, and Completed stages.',
+          status: 'in-progress',
+          priority: 'high',
+          projectId: 'proj_worksync_core',
+          dueDate: '2026-09-22',
+        },
+        {
+          id: 'task_3',
+          title: 'Build quick-add command palette modal',
+          description: 'Support Cmd+K / Ctrl+K shortcut to create tasks and jump anywhere in the app.',
+          status: 'pending',
+          priority: 'medium',
+          projectId: 'proj_worksync_core',
+          dueDate: '2026-09-25',
+        },
+        {
+          id: 'task_4',
+          title: 'Draft technical case study on agentic workflows',
+          description: 'Write a deep dive about pairing autonomous assistants with Next.js development.',
+          status: 'pending',
+          priority: 'medium',
+          projectId: 'proj_personal_branding',
+          dueDate: '2026-10-05',
+        },
+        {
+          id: 'task_5',
+          title: 'Setup Model Context Protocol (MCP) server integration',
+          description: 'Connect local knowledge repositories and dev tooling via standardized protocol.',
+          status: 'not-started',
+          priority: 'low',
+          projectId: 'proj_ai_agent_research',
+          dueDate: '2026-10-12',
+        },
+      ],
+      velocityData: [
+        { day: 'Mon', count: 5 },
+        { day: 'Tue', count: 8 },
+        { day: 'Wed', count: 6 },
+        { day: 'Thu', count: 9 },
+        { day: 'Fri', count: 7 },
+        { day: 'Sat', count: 11 },
+        { day: 'Sun', count: 4 },
+      ]
+    };
+
+    // Helper: Map status to Brand Colors & Labels
+    function getStatusBadge(status) {
+      switch (status) {
+        case 'completed':
+          return `<span class="badge badge-completed"><span class="badge-dot"></span> Completed</span>`;
+        case 'in-progress':
+          return `<span class="badge badge-in-progress"><span class="badge-dot"></span> In Progress</span>`;
+        case 'pending':
+          return `<span class="badge badge-pending"><span class="badge-dot"></span> Pending</span>`;
+        case 'overdue':
+          return `<span class="badge badge-overdue"><span class="badge-dot"></span> Overdue</span>`;
+        case 'review':
+          return `<span class="badge badge-review"><span class="badge-dot"></span> Review</span>`;
+        default:
+          return `<span class="badge badge-not-started"><span class="badge-dot"></span> Not Started</span>`;
+      }
+    }
+
+    function getPriorityBadge(priority) {
+      switch (priority) {
+        case 'urgent':
+          return `<span class="badge badge-overdue">Urgent</span>`;
+        case 'high':
+          return `<span class="badge badge-pending">High</span>`;
+        case 'medium':
+          return `<span class="badge badge-sky">Medium</span>`;
+        case 'low':
+          return `<span class="badge badge-not-started">Low</span>`;
+        default:
+          return `<span class="badge badge-not-started">${priority}</span>`;
+      }
+    }
+
+    // Initialize App
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      renderSidebarProjects();
+      renderDashboard();
+      renderProjectsDirectory();
+      renderWorkspace();
+      renderMyTasks();
+      renderCalendar();
+      renderAnalytics();
+      populateProjectSelect();
+
+      // Navigation listeners
+      document.querySelectorAll('.nav-item').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = link.getAttribute('data-view');
+          switchView(target);
+        });
+      });
+
+      // Keyboard shortcut Ctrl+K
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          openCommandModal();
+        }
+        if (e.key === 'Escape') {
+          closeAllModals();
+        }
+      });
+    });
+
+    // View Switcher
+    function switchView(viewName) {
+      state.currentView = viewName;
+
+      document.querySelectorAll('.nav-item').forEach(link => {
+        if (link.getAttribute('data-view') === viewName) link.classList.add('active');
+        else link.classList.remove('active');
+      });
+
+      document.querySelectorAll('.view-content').forEach(section => {
+        if (section.id === `view-${viewName}`) section.classList.add('active');
+        else section.classList.remove('active');
+      });
+
+      setTimeout(() => lucide.createIcons(), 20);
+    }
+
+    function switchWorkspaceSubTab(tabName) {
+      state.currentWsTab = tabName;
+      document.getElementById('wsSubTab-kanban').style.display = tabName === 'kanban' ? 'block' : 'none';
+      document.getElementById('wsSubTab-table').style.display = tabName === 'table' ? 'block' : 'none';
+
+      document.getElementById('tabBtn-kanban').className = tabName === 'kanban' ? 'btn btn-sm btn-secondary active' : 'btn btn-sm btn-ghost';
+      document.getElementById('tabBtn-table').className = tabName === 'table' ? 'btn btn-sm btn-secondary active' : 'btn btn-sm btn-ghost';
+      lucide.createIcons();
+    }
+
+    function openProjectWorkspace(projectId) {
+      state.activeProjectId = projectId;
+      renderWorkspace();
+      renderSidebarProjects();
+      switchView('workspace');
+    }
+
+    // Render Sidebar Projects
+    function renderSidebarProjects() {
+      const container = document.getElementById('sidebarProjectsShortcutList');
+      container.innerHTML = '';
+
+      state.projects.forEach(p => {
+        const isActive = p.id === state.activeProjectId && state.currentView === 'workspace';
+        const item = document.createElement('div');
+        item.className = `project-shortcut ${isActive ? 'active' : ''}`;
+        item.onclick = () => openProjectWorkspace(p.id);
+        item.innerHTML = `
+          <span class="project-dot" style="background-color: ${p.color};"></span>
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${p.name}</span>
+          <span class="caption-text" style="font-weight: 600;">${p.key}</span>
+        `;
+        container.appendChild(item);
+      });
+
+      document.getElementById('navProjBadge').innerText = state.projects.length;
+      document.getElementById('navTaskBadge').innerText = state.tasks.filter(t => t.status !== 'completed').length;
+    }
+
+    // Render Dashboard
+    function renderDashboard() {
+      const priorityTasksContainer = document.getElementById('dashboardPriorityTasksList');
+      const projectsGrid = document.getElementById('dashboardProjectsGrid');
+
+      // Priority Action Items
+      priorityTasksContainer.innerHTML = '';
+      const highPriorityTasks = state.tasks.filter(t => t.priority === 'urgent' || t.priority === 'high');
+
+      highPriorityTasks.forEach(task => {
+        const isDone = task.status === 'completed';
+        const project = state.projects.find(p => p.id === task.projectId);
+        const card = document.createElement('div');
+        card.className = `card task-card-item ${isDone ? 'is-completed' : ''}`;
+        card.innerHTML = `
+          <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+            <button onclick="toggleTask('${task.id}')" style="background: none; border: none; cursor: pointer; padding: 0; color: ${isDone ? 'var(--color-success)' : 'var(--border-color)'};">
+              <i data-lucide="${isDone ? 'check-circle-2' : 'circle'}" size="20"></i>
+            </button>
+            <div style="flex: 1;">
+              <div class="task-title-text">${task.title}</div>
+              <div class="task-meta-row">
+                ${getPriorityBadge(task.priority)}
+                ${getStatusBadge(task.status)}
+                <span class="caption-text" style="display: flex; align-items: center; gap: 0.25rem;">
+                  <i data-lucide="clock" size="12"></i> Due ${formatDateClean(task.dueDate)}
+                </span>
+                <span class="caption-text" style="font-weight: 600; color: ${project ? project.color : 'inherit'};">
+                  [${project ? project.key : ''}]
+                </span>
+              </div>
+            </div>
+          </div>
+        `;
+        priorityTasksContainer.appendChild(card);
+      });
+
+      // Projects
+      projectsGrid.innerHTML = '';
+      state.projects.slice(0, 3).forEach(project => {
+        const pTasks = state.tasks.filter(t => t.projectId === project.id);
+        const doneCount = pTasks.filter(t => t.status === 'completed').length;
+        const pct = pTasks.length > 0 ? Math.round((doneCount / pTasks.length) * 100) : 0;
+
+        const card = document.createElement('div');
+        card.className = 'card card-interactive';
+        card.onclick = () => openProjectWorkspace(project.id);
+        card.innerHTML = `
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="project-dot" style="background-color: ${project.color}; width: 10px; height: 10px;"></span>
+              <span style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">${project.key}</span>
+            </div>
+            <span class="badge badge-in-progress">${project.status}</span>
+          </div>
+          <h3 class="card-title" style="margin-bottom: 0.35rem;">${project.name}</h3>
+          <p class="secondary-text" style="margin-bottom: 1rem; min-height: 38px;">${project.description}</p>
+          
+          <div style="margin-bottom: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 0.35rem;">
+              <span class="secondary-text">Progress</span>
+              <span style="font-weight: 600; color: var(--text-primary);">${pct}%</span>
+            </div>
+            <div style="height: 6px; background-color: #F1F5F9; border-radius: 9999px; overflow: hidden;">
+              <div style="width: ${pct}%; height: 100%; background-color: ${project.color}; border-radius: 9999px;"></div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); border-top: 1px solid var(--border-color); padding-top: 0.65rem;">
+            <span>${doneCount}/${pTasks.length} tasks completed</span>
+            <span>Due ${formatDateClean(project.dueDate)}</span>
+          </div>
+        `;
+        projectsGrid.appendChild(card);
+      });
+
+      document.getElementById('dashCompletedCount').innerText = state.tasks.filter(t => t.status === 'completed').length;
+      document.getElementById('dashProjectsCount').innerText = state.projects.length;
+    }
+
+    // Render Projects Directory
+    function renderProjectsDirectory() {
+      const grid = document.getElementById('projectsDirectoryGrid');
+      grid.innerHTML = '';
+
+      const filtered = state.projects.filter(p => {
+        if (state.activeCategoryFilter !== 'all' && p.category !== state.activeCategoryFilter) return false;
+        return true;
+      });
+
+      filtered.forEach(project => {
+        const pTasks = state.tasks.filter(t => t.projectId === project.id);
+        const doneCount = pTasks.filter(t => t.status === 'completed').length;
+        const pct = pTasks.length > 0 ? Math.round((doneCount / pTasks.length) * 100) : 0;
+
+        const card = document.createElement('div');
+        card.className = 'card card-interactive';
+        card.onclick = () => openProjectWorkspace(project.id);
+        card.innerHTML = `
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="project-dot" style="background-color: ${project.color}; width: 10px; height: 10px;"></span>
+              <span style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">${project.key}</span>
+            </div>
+            <span class="badge badge-teal">${project.category}</span>
+          </div>
+          <h3 class="card-title" style="margin-bottom: 0.35rem;">${project.name}</h3>
+          <p class="secondary-text" style="margin-bottom: 1.25rem;">${project.description}</p>
+          
+          <div style="margin-bottom: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 0.35rem;">
+              <span class="secondary-text">Overall Completion</span>
+              <span style="font-weight: 600;">${pct}%</span>
+            </div>
+            <div style="height: 6px; background-color: #F1F5F9; border-radius: 9999px; overflow: hidden;">
+              <div style="width: ${pct}%; height: 100%; background-color: ${project.color};"></div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); border-top: 1px solid var(--border-color); padding-top: 0.65rem;">
+            <span>${pTasks.length} tasks total</span>
+            <span>Target ${formatDateClean(project.dueDate)}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterProjectsByCat(cat) {
+      state.activeCategoryFilter = cat;
+      document.querySelectorAll('#projCatButtons button').forEach(b => {
+        if (b.getAttribute('data-cat') === cat) b.className = 'btn btn-secondary btn-sm active';
+        else b.className = 'btn btn-secondary btn-sm';
+      });
+      renderProjectsDirectory();
+      lucide.createIcons();
+    }
+
+    function searchProjects(val) {
+      document.querySelectorAll('#projectsDirectoryGrid .card').forEach(c => {
+        c.style.display = c.innerText.toLowerCase().includes(val.toLowerCase()) ? 'block' : 'none';
+      });
+    }
+
+    // Render Project Workspace (5-Column Kanban Board & Table)
+    function renderWorkspace() {
+      const project = state.projects.find(p => p.id === state.activeProjectId) || state.projects[0];
+
+      document.getElementById('wsProjectDot').style.backgroundColor = project.color;
+      document.getElementById('wsProjectKey').innerText = project.key;
+      document.getElementById('wsProjectTitle').innerText = project.name;
+      document.getElementById('wsProjectDesc').innerText = project.description;
+      document.getElementById('wsProjectDueDate').innerText = `Due ${formatDateClean(project.dueDate)}`;
+
+      // 5 Official Status Stages
+      const columns = [
+        { id: 'not-started', label: 'Not Started', color: 'var(--status-not-started)' },
+        { id: 'pending', label: 'Pending', color: 'var(--status-pending)' },
+        { id: 'in-progress', label: 'In Progress', color: 'var(--status-in-progress)' },
+        { id: 'review', label: 'Review', color: 'var(--status-review)' },
+        { id: 'completed', label: 'Completed', color: 'var(--status-completed)' },
+      ];
+
+      const kanbanWrap = document.getElementById('kanbanColsContainer');
+      kanbanWrap.innerHTML = '';
+
+      const tableBody = document.getElementById('wsTableListBody');
+      tableBody.innerHTML = '';
+
+      const projectTasks = state.tasks.filter(t => t.projectId === project.id);
+
+      // Render 5 Kanban Columns
+      columns.forEach(col => {
+        const colTasks = projectTasks.filter(t => t.status === col.id);
+        const colEl = document.createElement('div');
+        colEl.className = 'kanban-col';
+
+        let cardsHtml = '';
+        colTasks.forEach(task => {
+          const isDone = task.status === 'completed';
+          cardsHtml += `
+            <div class="task-card-item ${isDone ? 'is-completed' : ''}" onclick="toggleTask('${task.id}')">
+              <div style="display: flex; align-items: flex-start; gap: 0.65rem;">
+                <button onclick="event.stopPropagation(); toggleTask('${task.id}')" style="background: none; border: none; cursor: pointer; padding: 0; color: ${isDone ? 'var(--color-success)' : 'var(--border-color)'};">
+                  <i data-lucide="${isDone ? 'check-circle-2' : 'circle'}" size="18"></i>
+                </button>
+                <div style="flex: 1;">
+                  <div class="task-title-text">${task.title}</div>
+                  <div class="task-meta-row">
+                    ${getPriorityBadge(task.priority)}
+                    ${task.dueDate ? `<span class="caption-text"><i data-lucide="clock" size="11"></i> ${formatDateClean(task.dueDate)}</span>` : ''}
+                  </div>
+                </div>
+              </div>
+              <div class="task-shifter-actions" onclick="event.stopPropagation();">
+                <button class="shift-btn" onclick="shiftStatus('${task.id}', -1)">← Prev</button>
+                <button class="shift-btn" onclick="shiftStatus('${task.id}', 1)">Next →</button>
+              </div>
+            </div>
+          `;
+        });
+
+        colEl.innerHTML = `
+          <div class="kanban-header">
+            <div class="kanban-header-title">
+              <span class="project-dot" style="background-color: ${col.color};"></span>
+              <span>${col.label}</span>
+            </div>
+            <span class="kanban-count-pill">${colTasks.length}</span>
+          </div>
+          <div class="kanban-cards-wrap">
+            ${cardsHtml.length > 0 ? cardsHtml : `<div style="padding: 2rem 0.5rem; text-align: center; color: var(--text-muted); font-size: 12px;">No tasks in this stage</div>`}
+          </div>
+          <div style="padding: 0.65rem 0.75rem; border-top: 1px solid var(--border-color); background: #F8FAFC; border-bottom-left-radius: var(--radius-card); border-bottom-right-radius: var(--radius-card);">
+            <button class="btn btn-ghost btn-sm" style="width: 100%; justify-content: flex-start; font-size: 13px;" onclick="quickAddColumnTask('${project.id}', '${col.id}')">
+              <i data-lucide="plus" size="14"></i> Add task...
+            </button>
+          </div>
+        `;
+        kanbanWrap.appendChild(colEl);
+      });
+
+      // Render Table Rows
+      projectTasks.forEach(task => {
+        const isDone = task.status === 'completed';
+        const row = document.createElement('tr');
+        row.style.borderBottom = '1px solid var(--border-color)';
+        row.innerHTML = `
+          <td style="padding: 0.85rem 1rem;">
+            <button onclick="toggleTask('${task.id}')" style="background: none; border: none; cursor: pointer; color: ${isDone ? 'var(--color-success)' : 'var(--border-color)'};">
+              <i data-lucide="${isDone ? 'check-circle-2' : 'circle'}" size="18"></i>
+            </button>
+          </td>
+          <td style="padding: 0.85rem 1rem; font-weight: 500; color: ${isDone ? 'var(--text-secondary)' : 'var(--text-primary)'}; ${isDone ? 'text-decoration: line-through;' : ''}">
+            ${task.title}
+          </td>
+          <td style="padding: 0.85rem 1rem;">${getStatusBadge(task.status)}</td>
+          <td style="padding: 0.85rem 1rem;">${getPriorityBadge(task.priority)}</td>
+          <td style="padding: 0.85rem 1rem; color: var(--text-secondary); font-size: 13px;">${formatDateClean(task.dueDate)}</td>
+          <td style="padding: 0.85rem 1rem;">
+            <button class="btn btn-ghost btn-sm" onclick="shiftStatus('${task.id}', 1)">Advance →</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      lucide.createIcons();
+    }
+
+    function shiftStatus(taskId, dir) {
+      const stages = ['not-started', 'pending', 'in-progress', 'review', 'completed'];
+      const task = state.tasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      const idx = stages.indexOf(task.status);
+      let nextIdx = idx + dir;
+      if (nextIdx < 0) nextIdx = 0;
+      if (nextIdx >= stages.length) nextIdx = stages.length - 1;
+
+      task.status = stages[nextIdx];
+      showToast(`Status updated to ${stages[nextIdx].replace('-', ' ')}`);
+      renderWorkspace();
+      renderDashboard();
+      renderMyTasks();
+    }
+
+    function toggleTask(taskId) {
+      const task = state.tasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      if (task.status === 'completed') {
+        task.status = 'in-progress';
+        showToast('Task marked in-progress');
+      } else {
+        task.status = 'completed';
+        showToast('Task completed! 🟢');
+      }
+
+      renderDashboard();
+      renderWorkspace();
+      renderMyTasks();
+      renderSidebarProjects();
+    }
+
+    function quickAddColumnTask(projectId, status) {
+      const title = prompt(`Enter task name for ${status.toUpperCase().replace('-', ' ')}:`);
+      if (!title || !title.trim()) return;
+
+      state.tasks.push({
+        id: `task_${Date.now()}`,
+        title: title.trim(),
+        description: '',
+        status: status,
+        priority: 'medium',
+        projectId: projectId,
+        dueDate: '2026-10-01',
+      });
+
+      showToast('Task added');
+      renderWorkspace();
+      renderDashboard();
+      renderMyTasks();
+      renderSidebarProjects();
+    }
+
+    // Render My Tasks View
+    function renderMyTasks() {
+      const body = document.getElementById('myTasksTableBody');
+      body.innerHTML = '';
+
+      const filtered = state.tasks.filter(t => {
+        if (state.activePriorityFilter !== 'all' && t.priority !== state.activePriorityFilter) return false;
+        return true;
+      });
+
+      filtered.forEach(task => {
+        const isDone = task.status === 'completed';
+        const project = state.projects.find(p => p.id === task.projectId);
+        const row = document.createElement('tr');
+        row.style.borderBottom = '1px solid var(--border-color)';
+        row.innerHTML = `
+          <td style="padding: 0.85rem 1rem;">
+            <button onclick="toggleTask('${task.id}')" style="background: none; border: none; cursor: pointer; color: ${isDone ? 'var(--color-success)' : 'var(--border-color)'};">
+              <i data-lucide="${isDone ? 'check-circle-2' : 'circle'}" size="18"></i>
+            </button>
+          </td>
+          <td style="padding: 0.85rem 1rem; font-weight: 500; color: ${isDone ? 'var(--text-secondary)' : 'var(--text-primary)'}; ${isDone ? 'text-decoration: line-through;' : ''}">
+            ${task.title}
+          </td>
+          <td style="padding: 0.85rem 1rem;">
+            <span style="display: flex; align-items: center; gap: 0.4rem; font-size: 13px;">
+              <span class="project-dot" style="background-color: ${project ? project.color : '#ccc'};"></span>
+              ${project ? project.name : ''}
+            </span>
+          </td>
+          <td style="padding: 0.85rem 1rem;">${getStatusBadge(task.status)}</td>
+          <td style="padding: 0.85rem 1rem;">${getPriorityBadge(task.priority)}</td>
+          <td style="padding: 0.85rem 1rem; color: var(--text-secondary); font-size: 13px;">${formatDateClean(task.dueDate)}</td>
+        `;
+        body.appendChild(row);
+      });
+      lucide.createIcons();
+    }
+
+    function filterMyTasks(pri) {
+      state.activePriorityFilter = pri;
+      document.querySelectorAll('#view-tasks button[data-pri]').forEach(b => {
+        if (b.getAttribute('data-pri') === pri) b.className = 'btn btn-secondary btn-sm active';
+        else b.className = 'btn btn-secondary btn-sm';
+      });
+      renderMyTasks();
+    }
+
+    // Render Calendar View
+    function renderCalendar() {
+      const container = document.getElementById('calendarCommitmentsList');
+      container.innerHTML = '';
+
+      state.tasks.filter(t => t.dueDate).forEach(task => {
+        const isDone = task.status === 'completed';
+        const project = state.projects.find(p => p.id === task.projectId);
+        const item = document.createElement('div');
+        item.style.padding = '0.75rem 1rem';
+        item.style.backgroundColor = '#F8FAFC';
+        item.style.border = '1px solid var(--border-color)';
+        item.style.borderRadius = '8px';
+        item.style.display = 'flex';
+        item.style.alignItems = 'center';
+        item.style.justifyContent = 'space-between';
+        item.innerHTML = `
+          <div>
+            <div style="font-weight: 600; font-size: 14px; ${isDone ? 'text-decoration: line-through; color: var(--text-secondary);' : ''}">${task.title}</div>
+            <div class="caption-text" style="margin-top: 0.2rem;">
+              ${project ? project.name : ''} • Target ${formatDateClean(task.dueDate)}
+            </div>
+          </div>
+          ${getStatusBadge(task.status)}
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // Pomodoro Timer
+    function togglePomodoro() {
+      if (state.pomodoroRunning) {
+        clearInterval(state.pomodoroTimer);
+        state.pomodoroRunning = false;
+        document.getElementById('pomodoroBtnText').innerText = 'Resume Focus';
+        document.getElementById('pomodoroIcon').setAttribute('data-lucide', 'play');
+      } else {
+        state.pomodoroRunning = true;
+        document.getElementById('pomodoroBtnText').innerText = 'Pause';
+        document.getElementById('pomodoroIcon').setAttribute('data-lucide', 'pause');
+
+        state.pomodoroTimer = setInterval(() => {
+          if (state.pomodoroSeconds > 0) {
+            state.pomodoroSeconds--;
+            updateTimerDisplay();
+          } else {
+            clearInterval(state.pomodoroTimer);
+            state.pomodoroRunning = false;
+            showToast('Focus session complete! Take a break ☕');
+            resetPomodoro();
+          }
+        }, 1000);
+      }
+      lucide.createIcons();
+    }
+
+    function resetPomodoro() {
+      clearInterval(state.pomodoroTimer);
+      state.pomodoroRunning = false;
+      state.pomodoroSeconds = 1500;
+      updateTimerDisplay();
+      document.getElementById('pomodoroBtnText').innerText = 'Start Focus';
+      document.getElementById('pomodoroIcon').setAttribute('data-lucide', 'play');
+      lucide.createIcons();
+    }
+
+    function updateTimerDisplay() {
+      const m = Math.floor(state.pomodoroSeconds / 60);
+      const s = state.pomodoroSeconds % 60;
+      document.getElementById('pomodoroDisplay').innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    // Render Analytics Chart
+    function renderAnalytics() {
+      const container = document.getElementById('velocityChartBars');
+      container.innerHTML = '';
+      const maxVal = Math.max(...state.velocityData.map(v => v.count));
+
+      state.velocityData.forEach(v => {
+        const heightPct = Math.round((v.count / maxVal) * 100);
+        const bar = document.createElement('div');
+        bar.style.flex = '1';
+        bar.style.display = 'flex';
+        bar.style.flexDirection = 'column';
+        bar.style.alignItems = 'center';
+        bar.style.justifyContent = 'flex-end';
+        bar.style.height = '100%';
+        bar.style.gap = '0.45rem';
+
+        bar.innerHTML = `
+          <span class="caption-text" style="font-weight: 600;">${v.count}</span>
+          <div style="width: 100%; max-width: 36px; height: ${heightPct}%; background-color: var(--color-primary); border-radius: 6px; transition: height 0.3s ease;"></div>
+          <span class="caption-text">${v.day}</span>
+        `;
+        container.appendChild(bar);
+      });
+    }
+
+    // Modals
+    function openNewTaskModal() {
+      document.getElementById('taskModal').classList.add('open');
+      document.getElementById('modalTaskTitle').focus();
+    }
+
+    function openNewProjectModal() {
+      document.getElementById('projectModal').classList.add('open');
+      document.getElementById('modalProjName').focus();
+    }
+
+    function openCommandModal() {
+      document.getElementById('commandModal').classList.add('open');
+      const input = document.getElementById('cmdInput');
+      input.value = '';
+      input.focus();
+      filterCommandList('');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    function closeAllModals() {
+      document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+    }
+
+    function populateProjectSelect() {
+      const select = document.getElementById('modalTaskProject');
+      select.innerHTML = '';
+      state.projects.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.innerText = p.name;
+        select.appendChild(opt);
+      });
+    }
+
+    // Submit Handlers
+    function handleTaskSubmit(e) {
+      e.preventDefault();
+      const title = document.getElementById('modalTaskTitle').value.trim();
+      const desc = document.getElementById('modalTaskDesc').value.trim();
+      const projectId = document.getElementById('modalTaskProject').value;
+      const priority = document.getElementById('modalTaskPriority').value;
+      const dueDate = document.getElementById('modalTaskDueDate').value;
+
+      if (!title) return;
+
+      state.tasks.unshift({
+        id: `task_${Date.now()}`,
+        title,
+        description: desc,
+        status: 'pending',
+        priority,
+        projectId,
+        dueDate: dueDate || '2026-10-01',
+      });
+
+      closeModal('taskModal');
+      e.target.reset();
+      showToast(`Task "${title}" created`);
+
+      renderDashboard();
+      renderWorkspace();
+      renderMyTasks();
+      renderCalendar();
+      renderSidebarProjects();
+    }
+
+    function handleProjectSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('modalProjName').value.trim();
+      const desc = document.getElementById('modalProjDesc').value.trim();
+      const key = document.getElementById('modalProjKey').value.trim().toUpperCase();
+      const category = document.getElementById('modalProjCategory').value;
+
+      if (!name) return;
+
+      const colors = ['#4F46E5', '#0EA5E9', '#14B8A6', '#8B5CF6'];
+      const color = colors[state.projects.length % colors.length];
+
+      state.projects.push({
+        id: `proj_${Date.now()}`,
+        name,
+        description: desc,
+        key: key || 'PRJ',
+        color,
+        category,
+        status: 'In Progress',
+        dueDate: '2026-12-01',
+      });
+
+      closeModal('projectModal');
+      e.target.reset();
+      populateProjectSelect();
+      showToast(`Project "${name}" created`);
+
+      renderSidebarProjects();
+      renderProjectsDirectory();
+      renderDashboard();
+    }
+
+    function filterCommandList(val) {
+      const list = document.getElementById('cmdList');
+      list.innerHTML = '';
+
+      const items = [
+        { label: 'Go to Dashboard', icon: 'layout-dashboard', run: () => switchView('dashboard') },
+        { label: 'Browse Projects', icon: 'folder', run: () => switchView('projects') },
+        { label: 'Open Kanban Workspace', icon: 'kanban', run: () => switchView('workspace') },
+        { label: 'My Tasks Inbox', icon: 'check-square', run: () => switchView('tasks') },
+        { label: 'Calendar & Focus Studio', icon: 'calendar', run: () => switchView('calendar') },
+        { label: 'Productivity Analytics', icon: 'bar-chart-2', run: () => switchView('analytics') },
+        { label: 'Workspace Settings', icon: 'settings', run: () => switchView('settings') },
+        { label: 'New Task', icon: 'plus-circle', run: () => { closeAllModals(); openNewTaskModal(); } },
+        { label: 'New Project', icon: 'folder-plus', run: () => { closeAllModals(); openNewProjectModal(); } },
+      ];
+
+      items.filter(i => i.label.toLowerCase().includes(val.toLowerCase())).forEach(i => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-ghost';
+        btn.style.width = '100%';
+        btn.style.justifyContent = 'flex-start';
+        btn.style.padding = '0.55rem 0.75rem';
+        btn.innerHTML = `<i data-lucide="${i.icon}" size="16"></i> <span>${i.label}</span>`;
+        btn.onclick = () => {
+          closeAllModals();
+          i.run();
+        };
+        list.appendChild(btn);
+      });
+      lucide.createIcons();
+    }
+
+    function showToast(msg) {
+      const tray = document.getElementById('toastTray');
+      const toast = document.createElement('div');
+      toast.className = 'toast-box';
+      toast.innerHTML = `<i data-lucide="check" size="16" style="color: var(--color-primary);"></i> <span>${msg}</span>`;
+      tray.appendChild(toast);
+      lucide.createIcons();
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 250);
+      }, 2500);
+    }
+
+    function formatDateClean(dateStr) {
+      if (!dateStr) return 'No date';
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const d = new Date(parts[0], parts[1] - 1, parts[2]);
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      }
+      return dateStr;
+    }
+  </script>
+</body>
+</html>

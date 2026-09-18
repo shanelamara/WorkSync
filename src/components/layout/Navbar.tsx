@@ -84,6 +84,29 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenQuickAdd }) => {
           </Button>
 
           <button
+            onClick={() => {
+              if (typeof document !== 'undefined') {
+                const current = document.documentElement.getAttribute('data-theme') || 'dark';
+                const next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+              }
+            }}
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--text-secondary)',
+              padding: '0.5rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+            title="Toggle Light/Dark Theme"
+          >
+            <Sun size={16} />
+          </button>
+
+          <button
             style={{
               background: 'transparent',
               border: '1px solid var(--border-subtle)',

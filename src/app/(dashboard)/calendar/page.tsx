@@ -1,12 +1,45 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 import { INITIAL_TASKS } from '@/data/seedData';
-import { Calendar as CalendarIcon, Clock } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Play, Pause, RotateCcw } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 
 export default function CalendarPage() {
   const tasksWithDates = INITIAL_TASKS.filter((t) => t.dueDate);
+
+  const [seconds, setSeconds] = useState(1500); // 25 min default
+  const [isRunning, setIsRunning] = useState(false);
+  const [sessionsCompleted, setSessionsCompleted] = useState(2);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (isRunning && seconds > 0) {
+      interval = setInterval(() => {
+        setSeconds((prev) => prev - 1);
+      }, 1000);
+    } else if (seconds === 0 && isRunning) {
+      setIsRunning(false);
+      setSessionsCompleted((prev) => prev + 1);
+      setSeconds(1500);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isRunning, seconds]);
+
+  const toggleTimer = () => setIsRunning(!isRunning);
+  const resetTimer = () => {
+    setIsRunning(false);
+    setSeconds(1500);
+  };
+
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  const timeString = `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
 
   return (
     <div>
@@ -15,7 +48,7 @@ export default function CalendarPage() {
           Calendar & Schedule
         </h1>
         <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-          Upcoming deadlines, time-blocked commitments, and milestones.
+          Upcoming deadlines, time-blocked commitments, and Pomodoro focus intervals.
         </p>
       </div>
 
@@ -55,32 +88,68 @@ export default function CalendarPage() {
         </Card>
 
         {/* Focus Timer / Mini Planner */}
-        <Card>
-          <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
+        <Card style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
             Focus Session
           </h3>
           <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-            Pomodoro focus block for your highest priority task.
+            Pomodoro focus block for deep execution.
           </p>
 
           <div
             style={{
+              width: '160px',
+              height: '160px',
+              borderRadius: '50%',
+              border: '4px solid var(--accent-primary)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '2rem 1rem',
-              backgroundColor: 'var(--bg-secondary)',
-              borderRadius: 'var(--radius-lg)',
-              border: '1px solid var(--border-subtle)',
+              boxShadow: '0 0 25px var(--accent-primary-glow)',
+              marginBottom: '1.5rem',
             }}
           >
-            <div style={{ fontSize: '2.5rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--accent-primary)' }}>
-              25:00
+            <div style={{ fontSize: '2.5rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
+              {timeString}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-              Deep Work Interval
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
+              {isRunning ? 'Flow State' : 'Interval 1/4'}
             </span>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.65rem', marginBottom: '1.25rem' }}>
+            <Button
+              variant="primary"
+              size="sm"
+              icon={isRunning ? <Pause size={14} /> : <Play size={14} />}
+              onClick={toggleTimer}
+            >
+              {isRunning ? 'Pause' : 'Start Focus'}
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={<RotateCcw size={14} />}
+              onClick={resetTimer}
+            >
+              Reset
+            </Button>
+          </div>
+
+          <div
+            style={{
+              width: '100%',
+              borderTop: '1px solid var(--border-subtle)',
+              paddingTop: '0.85rem',
+              fontSize: '0.75rem',
+              color: 'var(--text-muted)',
+              display: 'flex',
+              justifyContent: 'space-around',
+            }}
+          >
+            <span>Target: 4 blocks</span>
+            <span>Completed: {sessionsCompleted} 🔥</span>
           </div>
         </Card>
       </div>

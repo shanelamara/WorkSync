@@ -8,12 +8,14 @@ import { formatDate, getPriorityMeta } from '@/lib/utils';
 interface TaskCardProps {
   task: Task;
   onToggleStatus?: (taskId: string) => void;
+  onShiftStage?: (taskId: string, direction: -1 | 1) => void;
   onClick?: (task: Task) => void;
 }
 
 export const TaskCard: React.FC<TaskCardProps> = ({
   task,
   onToggleStatus,
+  onShiftStage,
   onClick,
 }) => {
   const isDone = task.status === 'done';
@@ -142,8 +144,55 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               </span>
             ))}
           </div>
+
+          {onShiftStage && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                gap: '0.35rem',
+                marginTop: '0.65rem',
+                paddingTop: '0.5rem',
+                borderTop: '1px dashed var(--border-subtle)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                style={{
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-secondary)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '0.15rem 0.45rem',
+                  fontSize: '0.7rem',
+                  cursor: 'pointer',
+                }}
+                onClick={() => onShiftStage(task.id, -1)}
+                title="Move to previous stage"
+              >
+                ← Prev
+              </button>
+              <button
+                style={{
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-secondary)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '0.15rem 0.45rem',
+                  fontSize: '0.7rem',
+                  cursor: 'pointer',
+                }}
+                onClick={() => onShiftStage(task.id, 1)}
+                title="Move to next stage"
+              >
+                Next →
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </Card>
   );
 };
+

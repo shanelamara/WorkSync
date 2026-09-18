@@ -21,6 +21,16 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onStatusChange,
   onAddTask,
 }) => {
+  const handleShiftStage = (taskId: string, direction: -1 | 1) => {
+    const task = tasks.find((t) => t.id === taskId);
+    if (!task || !onStatusChange) return;
+    const currentIdx = COLUMNS.indexOf(task.status);
+    let newIdx = currentIdx + direction;
+    if (newIdx < 0) newIdx = 0;
+    if (newIdx >= COLUMNS.length) newIdx = COLUMNS.length - 1;
+    onStatusChange(taskId, COLUMNS[newIdx]);
+  };
+
   return (
     <div
       style={{
@@ -103,6 +113,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     const next = task.status === 'done' ? 'todo' : 'done';
                     onStatusChange && onStatusChange(task.id, next);
                   }}
+                  onShiftStage={handleShiftStage}
                 />
               ))}
 
